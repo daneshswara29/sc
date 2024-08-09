@@ -13,5 +13,5 @@
 </code></pre>
 
 ### UPDATE SCRIPT 
-<pre><code>wget -q https://raw.githubusercontent.com/bumiayuvpn/bumiayuvpn/main/update.sh && chmod +x update.sh && ./update.sh
+<pre><code>wget -q https://raw.githubusercontent.com/daneshswara29/sc/main/update.sh && chmod +x update.sh && ./update.sh
 </code></pre>
