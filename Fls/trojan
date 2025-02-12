@@ -1,15 +1,23 @@
 #!/bin/bash
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# System Request : Debian 9+/Ubuntu 18.04+/20+
+# Develovers » Gemilangkinasih࿐
+# Email      » gemilangkinasih@gmail.com
+# telegram   » https://t.me/gemilangkinasih
+# whatsapp   » wa.me/+628984880039
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# Gemilangkinasih࿐
+
 function send-log(){
-CHATID=$(grep -E "^#bot# " "/etc/bot/.bot.db" | cut -d ' ' -f 3)
-KEY=$(grep -E "^#bot# " "/etc/bot/.bot.db" | cut -d ' ' -f 2)
+CHATID=$(cat /etc/per/id)
+KEY=$(cat /etc/per/token)
 TIME="10"
 URL="https://api.telegram.org/bot$KEY/sendMessage"
 TEXT="
 <code>────────────────────</code>
-<b>⚠️NOTIF QUOTA HABIS XRAY TROJAN⚠️</b>
+<b>⚠️NOTIF QUOTA HABIS⚠️</b>
 <code>────────────────────</code>
 <code>Username  : </code><code>$user</code>
-<code>limit Quota: </code><code>$total2</code>
 <code>Usage     : </code><code>$total</code>
 <code>────────────────────</code>
 "
@@ -37,10 +45,14 @@ function con() {
   mkdir -p /etc/limit/trojan
   fi
   for user in ${data[@]}
-  do        downlink=$(xray api stats --server=127.0.0.1:10000 -name "user>>>${user}>>>traffic>>>downlink" | grep -w "value" | awk '{print $2}' | cut -d '"' -f2);
+  do
+  xray api stats --server=127.0.0.1:10000 -name "user>>>${user}>>>traffic>>>downlink" >& /tmp/${user}
+  getThis=$(cat /tmp/${user} | awk '{print $1}');
+  if [[ ${getThis} != "failed" ]]; then
+        downlink=$(xray api stats --server=127.0.0.1:10000 -name "user>>>${user}>>>traffic>>>downlink" | grep -w "value" | awk '{print $2}' | cut -d '"' -f2);
         if [ -e /etc/limit/trojan/${user} ]; then
         plus2=$(cat /etc/limit/trojan/${user});
-        if [[ ${plus2} -gt 0 ]]; then
+        if [[ ${#plus2} -gt 0 ]]; then
         plus3=$(( ${downlink} + ${plus2} ));
         echo "${plus3}" > /etc/limit/trojan/"${user}"
         xray api stats --server=127.0.0.1:10000 -name "user>>>${user}>>>traffic>>>downlink" -reset > /dev/null 2>&1
@@ -48,26 +60,33 @@ function con() {
         echo "${downlink}" > /etc/limit/trojan/"${user}"
         xray api stats --server=127.0.0.1:10000 -name "user>>>${user}>>>traffic>>>downlink" -reset > /dev/null 2>&1
         fi
+        else
+        echo "${downlink}" > /etc/limit/trojan/"${user}"
+        xray api stats --server=127.0.0.1:10000 -name "user>>>${user}>>>traffic>>>downlink" -reset > /dev/null 2>&1
         fi
+        else
+      echo ""
+   fi
 done
 # Check ur Account
 for user in ${data[@]}
   do
     if [ -e /etc/trojan/${user} ]; then
       checkLimit=$(cat /etc/trojan/${user});
-      if [[ ${checkLimit} -gt 1 ]]; then
+      if [[ ${#checkLimit} -gt 1 ]]; then
       if [ -e /etc/limit/trojan/${user} ]; then
       Usage=$(cat /etc/limit/trojan/${user});
-      total=$(con ${Usage})
-      total2=$(con ${checkLimit})
       if [[ ${Usage} -gt ${checkLimit} ]]; then
-    uuid=$(grep -E "^},{" "/etc/xray/config.json" |  grep -i '"'"${user}"'"' | cut -d " " -f 2 | cut -d '"' -f 2 | uniq )
-    exp=$(grep -wE "^#! $user" "/etc/xray/config.json" | cut -d ' ' -f 3 | sort | uniq)
-    sed -i '/#trojan$/a\#! '"$user $exp $uuid"'' /etc/xray/.lock.db
-    sed -i "/^#! $user $exp/,/^},{/d" /etc/xray/config.json
-      send-log
-      rm -rf /etc/limit/trojan/${user}
-	  sed -i "d" /etc/trojan/$user
+      exp=$(grep -w "^#! $user" "/etc/xray/config.json" | cut -d ' ' -f 3 | sort | uniq)
+      sed -i "/^#! $user $exp/,/^},{/d" /etc/xray/config.json
+      sed -i "/^#! $user $exp/d" /etc/trojan/.trojan.db
+       total=$(con ${Usage})
+       send-log
+       rm -f /etc/funny/limit/trojan/ip/$user
+       rm -f /etc/limit/trojan/$user
+       rm -f /etc/limit/trojan/quota/$user
+       rm -f /etc/trojan/$user
+	   rm -f /var/www/html/trojan-$user.txt
       systemctl restart xray >> /dev/null 2>&1
       else
       echo ""
@@ -83,4 +102,3 @@ for user in ${data[@]}
     fi
   done
 done
-
